@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 interface DataSourceModule {
 
     @Binds
-    abstract fun providesFilmsDataSource(
+    fun providesFilmsDataSource(
         filmsDataSourceImpl: FilmsDataSourceImpl
     ): FilmsDataSource
 

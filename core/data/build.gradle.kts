@@ -28,7 +28,8 @@ dependencies {
     implementation(libs.moshi.converter)
     implementation(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
-
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime)
 }
 
 fun getProperty(filename: String, propName: String): String? {
