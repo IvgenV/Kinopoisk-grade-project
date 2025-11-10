@@ -52,8 +52,8 @@ android {
 }
 
 dependencies {
-
     implementation(projects.feature.films)
+    implementation(projects.feature.premieres)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

@@ -1,22 +1,22 @@
-package com.example.core.data.datasource.films
+package com.example.core.data.datasource.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.core.data.model.dto.FilmsCollectionsDto
+import com.example.core.data.model.response.toTdo
 import com.example.core.data.network.MovieService
-import com.example.core.data.response.FilmsCollectionsResponse.Item
+import com.example.kinopoisk.core.base.Constants.INITIAL_PAGE_NO
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
-const val INITIAL_PAGE_NO = 1
-
-class PagingDataSourceImpl @AssistedInject constructor(
+class GetFilmsPagingFataSource @AssistedInject constructor(
     private val movieApi: MovieService,
     @Assisted
     private val type: String
-) : PagingSource<Int, Item>() {
+) : PagingSource<Int, FilmsCollectionsDto.Item>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Item> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FilmsCollectionsDto.Item> {
         return try {
             val nextPage = params.key ?: INITIAL_PAGE_NO
             val maxPage: Int
@@ -24,9 +24,10 @@ class PagingDataSourceImpl @AssistedInject constructor(
             movieApi.getFilmsCollections(
                 page = nextPage,
                 type = type
-            ).let {
-                maxPage = it.totalPages ?: 0
-                val cardList: List<Item> = it.items?.filterNotNull() ?: emptyList()
+            ).toTdo().let {
+                maxPage = it.totalPages
+                val cardList: List<FilmsCollectionsDto.Item> =
+                    it.items.filterNotNull()
                 LoadResult.Page(
                     data = cardList,
                     prevKey = null,
@@ -40,7 +41,7 @@ class PagingDataSourceImpl @AssistedInject constructor(
     }
 
 
-    override fun getRefreshKey(state: PagingState<Int, Item>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, FilmsCollectionsDto.Item>): Int? {
         return state.anchorPosition
     }
 }
@@ -49,5 +50,5 @@ class PagingDataSourceImpl @AssistedInject constructor(
 interface PagingDataSourceFactory {
     fun create(
         type: String
-    ): PagingDataSourceImpl
+    ): GetFilmsPagingFataSource
 }

@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 interface RepositoryModule {
 
     @Binds
-    abstract fun providesFilmsRepository(
+    fun providesFilmsRepository(
         filmsRepository: FilmsRepositoryImpl
     ): FilmsRepository
 
