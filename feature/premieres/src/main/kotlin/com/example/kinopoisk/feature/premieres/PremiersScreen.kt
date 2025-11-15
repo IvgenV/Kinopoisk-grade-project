@@ -1,17 +1,18 @@
 package com.example.kinopoisk.feature.premieres
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LongState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -50,23 +51,31 @@ internal fun PremiersScreen(
     height: Dp
 ) {
 
+    Column(
+        Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) { }
+
     Box(Modifier.fillMaxSize()) {
 
-        LazyColumn {
+        LazyVerticalGrid(
+            modifier = Modifier,
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
 
             items(premiers) { item ->
-                Column(
-                    modifier = Modifier.size(
-                        height = height,
-                        width = width
-                    )
-                ) {
-                    AsyncImage(
-                        model = item.posterUrl,
-                        contentDescription = "Some descr",
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                AsyncImage(
+                    modifier = Modifier
+                        .width(width / 2)
+                        .height(height / 3),
+                    model = item.posterUrl,
+                    contentDescription = "Some descr",
+                    contentScale = ContentScale.Crop
+                )
             }
 
         }

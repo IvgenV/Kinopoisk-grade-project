@@ -1,10 +1,14 @@
 package com.example.core.data.model.dto
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class FilmsCollectionsDto(
     val items: List<Item?> = emptyList(),
     val total: Int = 0,
     val totalPages: Int = 0
 ) {
+    @Immutable
     class Item(
         val countries: List<Country?> = emptyList(),
         val genres: List<Genre?> = emptyList(),
@@ -19,10 +23,12 @@ data class FilmsCollectionsDto(
         val type: String? = null,
         val year: String? = null
     ) {
+        @Immutable
         class Country(
             val country: String? = null
         )
 
+        @Immutable
         class Genre(
             val genre: String? = null
         )

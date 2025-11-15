@@ -3,12 +3,14 @@ package com.example.kinopoisk
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,19 +19,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
+import com.example.kinopoisk.feature.films.FilmsCollection
+import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
+import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
-import com.example.kinopoisk.feature.films.MainScreen.TOP_250_MOVIES
-import com.example.kinopoisk.feature.films.MainScreen.TOP_250_TV_SHOWS
 import com.example.kinopoisk.feature.premieres.PremiersRoute
 import com.example.kinopoisk.ui.theme.KinopoiskTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,11 +39,11 @@ private sealed interface TopLevelRoute : NavKey {
     val icon: ImageVector
 }
 
-private data object Home : TopLevelRoute {
+private data object Films : TopLevelRoute {
     override val icon = Icons.Default.Home
 }
 
-private data object ChatList : TopLevelRoute {
+private data object Premiers : TopLevelRoute {
     override val icon = Icons.Default.Face
 }
 
@@ -51,22 +52,30 @@ private data object Camera : TopLevelRoute {
     override val icon = Icons.Default.PlayArrow
 }
 
-private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Home, ChatList, Camera)
+private data object Filter : NavKey
+
+private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Films, Premiers)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
+        enableEdgeToEdge()
         setContent {
 
-            val topLevelBackStack = remember { TopLevelBackStack<Any>(Home) }
+            val topLevelBackStack = remember { TopLevelBackStack<NavKey>(Films) }
+
+            val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
+
+            val resultStore = rememberResultStore()
 
             var isBottomItem: Boolean by rememberSaveable {
                 mutableStateOf(true)
             }
 
             KinopoiskTheme {
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -98,22 +107,36 @@ class MainActivity : ComponentActivity() {
                     NavDisplay(
                         backStack = topLevelBackStack.backStack,
                         onBack = { topLevelBackStack.removeLast() },
+                        sceneStrategy = bottomSheetStrategy,
                         entryProvider = { key ->
                             when (key) {
-                                is Home -> NavEntry(key) {
+                                is Films -> NavEntry(key) {
+                                    val result = resultStore.getResultState<FilmsCollection?>()
+                                        ?: TOP_POPULAR_ALL
                                     FilmsRoute(
-                                        screenType = TOP_250_MOVIES.name
+                                        screenType = result.name,
+                                        resultState = result.name,
+                                        toBottomShet = {
+                                            topLevelBackStack.add(Filter)
+                                        }
                                     )
                                 }
 
-                                is ChatList -> NavEntry(key) {
-                                    FilmsRoute(
-                                        screenType = TOP_250_TV_SHOWS.name
-                                    )
-                                }
-
-                                is Camera -> NavEntry(key) {
+                                is Premiers -> NavEntry(key) {
                                     PremiersRoute()
+                                }
+
+                                is Filter -> NavEntry(
+                                    key,
+                                    metadata = BottomSheetSceneStrategy.bottomSheet()
+                                ) {
+                                    FilmsFilterScreen(
+                                        selectedFilter = resultStore.getResultState<FilmsCollection?>()
+                                            ?: TOP_POPULAR_ALL
+                                    ) { result ->
+                                        resultStore.setResult<FilmsCollection>(result = result)
+                                        topLevelBackStack.removeLast()
+                                    }
                                 }
 
                                 else -> error("Unknown route: $key")
@@ -153,7 +176,7 @@ class TopLevelBackStack<T : Any>(startKey: T) {
 
         // If the top level doesn't exist, add it
         if (topLevelStacks[key] == null) {
-            topLevelStacks.put(key, mutableStateListOf(key))
+            topLevelStacks[key] = mutableStateListOf(key)
         } else {
             // Otherwise just move it to the end of the stacks
             topLevelStacks.apply {
