@@ -54,6 +54,9 @@ android {
 dependencies {
     implementation(projects.feature.films)
     implementation(projects.feature.premieres)
+    implementation(projects.feature.detail)
+    implementation(projects.core.data)
+    implementation(projects.core.base)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -79,6 +82,7 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.material3.navigation3)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     ksp(libs.hilt.compiler)
 

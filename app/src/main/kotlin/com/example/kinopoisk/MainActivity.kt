@@ -5,11 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,16 +28,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.kinopoisk.core.base.theme.KinopoiskTheme
+import com.example.kinopoisk.feature.detail.DetailsScreenRoute
+import com.example.kinopoisk.feature.detail.DetailsScreenViewModel
 import com.example.kinopoisk.feature.films.FilmsCollection
 import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
 import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
 import com.example.kinopoisk.feature.premieres.PremiersRoute
-import com.example.kinopoisk.ui.theme.KinopoiskTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
 
 private sealed interface TopLevelRoute : NavKey {
     val icon: ImageVector
@@ -47,10 +57,8 @@ private data object Premiers : TopLevelRoute {
     override val icon = Icons.Default.Face
 }
 
-private data object ChatDetail : NavKey
-private data object Camera : TopLevelRoute {
-    override val icon = Icons.Default.PlayArrow
-}
+@Serializable
+private data class FilmsDetail(val kinopoiskId: Int) : NavKey
 
 private data object Filter : NavKey
 
@@ -58,7 +66,7 @@ private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Films, Premiers)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,21 +74,26 @@ class MainActivity : ComponentActivity() {
 
             val topLevelBackStack = remember { TopLevelBackStack<NavKey>(Films) }
 
+
             val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
             val resultStore = rememberResultStore()
 
-            var isBottomItem: Boolean by rememberSaveable {
+            var showBottomBar: Boolean by rememberSaveable {
                 mutableStateOf(true)
             }
 
             KinopoiskTheme {
 
+
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     bottomBar = {
                         AnimatedVisibility(
-                            visible = isBottomItem
+                            visible = showBottomBar,
+                            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
                         ) {
                             NavigationBar {
                                 TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
@@ -89,7 +102,9 @@ class MainActivity : ComponentActivity() {
                                     NavigationBarItem(
                                         selected = isSelected,
                                         onClick = {
-                                            topLevelBackStack.addTopLevel(topLevelRoute)
+                                            topLevelBackStack.addTopLevel(
+                                                topLevelRoute
+                                            )
                                         },
                                         icon = {
                                             Icon(
@@ -108,21 +123,31 @@ class MainActivity : ComponentActivity() {
                         backStack = topLevelBackStack.backStack,
                         onBack = { topLevelBackStack.removeLast() },
                         sceneStrategy = bottomSheetStrategy,
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator()
+                        ),
                         entryProvider = { key ->
                             when (key) {
                                 is Films -> NavEntry(key) {
-                                    val result = resultStore.getResultState<FilmsCollection?>()
-                                        ?: TOP_POPULAR_ALL
+                                    showBottomBar = true
+                                    val result =
+                                        resultStore.getResultState<FilmsCollection?>()
+                                            ?: TOP_POPULAR_ALL
                                     FilmsRoute(
                                         screenType = result.name,
                                         resultState = result.name,
                                         toBottomShet = {
                                             topLevelBackStack.add(Filter)
+                                        },
+                                        itemClicked = { item ->
+                                            topLevelBackStack.add(FilmsDetail(item.kinopoiskId ?: 0))
                                         }
                                     )
                                 }
 
                                 is Premiers -> NavEntry(key) {
+                                    showBottomBar = true
                                     PremiersRoute()
                                 }
 
@@ -134,17 +159,35 @@ class MainActivity : ComponentActivity() {
                                         selectedFilter = resultStore.getResultState<FilmsCollection?>()
                                             ?: TOP_POPULAR_ALL
                                     ) { result ->
-                                        resultStore.setResult<FilmsCollection>(result = result)
+                                        resultStore.setResult<FilmsCollection>(
+                                            result = result
+                                        )
                                         topLevelBackStack.removeLast()
                                     }
+                                }
+
+                                is FilmsDetail -> NavEntry(key) {
+
+                                    showBottomBar = false
+
+                                    val viewModel = hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
+                                        creationCallback = { factory ->
+                                            factory.create(key.kinopoiskId)
+                                        }
+                                    )
+
+                                    DetailsScreenRoute(
+                                        viewModel
+                                    )
                                 }
 
                                 else -> error("Unknown route: $key")
                             }
                         }
                     )
-
                 }
+
+
             }
         }
 

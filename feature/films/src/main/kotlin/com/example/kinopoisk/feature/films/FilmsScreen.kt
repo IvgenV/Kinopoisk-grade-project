@@ -50,7 +50,8 @@ fun FilmsRoute(
     viewModel: FilmsViewModel = hiltViewModel(),
     screenType: String,
     resultState: String = "",
-    toBottomShet: () -> Unit = {}
+    toBottomShet: () -> Unit = {},
+    itemClicked: (FilmsCollectionsDto.Item) -> Unit,
 ) {
 
     val conf = LocalConfiguration.current
@@ -71,91 +72,46 @@ fun FilmsRoute(
 
     val scrollState = rememberLazyGridState()
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+        Button(
+            onClick = {
+                //toBottomShet.invoke()
+            }
+        ) {
+            Text("to bottom sheet")
+        }
 
-        SharedTransitionLayout {
+        Text("resultState")
 
-            AnimatedContent(
-                showDetails,
-                label = "khjbhkdjfkgfnkgf"
-            ) { targetState ->
+        LazyVerticalGrid(
+            state = scrollState,
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
 
-                if (!targetState) {
+            items(
+                count = items.itemCount,
+            ) { position ->
 
-
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .statusBarsPadding()
-                    ) {
-                        Button(
-                            onClick = {
-                                //toBottomShet.invoke()
-                            }
-                        ) {
-                            Text("to bottom sheet")
-                        }
-
-                        Text("resultState")
-
-                        LazyVerticalGrid(
-                            state = scrollState,
-                            columns = GridCells.Fixed(2),
-                            contentPadding = PaddingValues(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-
-                            items(
-                                count = items.itemCount,
-                            ) { position ->
-
-                                items[position]?.let {
-                                    pictureItem(
-                                        item = it,
-                                        width = width / 2,
-                                        height = height / 3,
-                                        onClick = {
-                                            selectedItem = it
-                                            showDetails = true
-                                        },
-                                        sharedTransitionScope = this@SharedTransitionLayout,
-                                        animatedVisibilityScope = this@AnimatedContent,
-                                    )
-                                }
-
-
-                            }
-
-                        }
-                    }
-
-
-//                MainContent(
-//                    items = items,
-//                    width = width,
-//                    height = height,
-//                    onClick = {
-//                        selectedItem = it
-//                        showDetails = true
-//                    },
-//                    animatedVisibilityScope = this@AnimatedContent,
-//                    sharedTransitionScope = this@SharedTransitionLayout
-//                )
-                } else {
-                    BackHandler { showDetails = false }
-                    DetailContent(
-                        width = width,
-                        height = height,
-                        item = selectedItem!!,
-                        animatedVisibilityScope = this@AnimatedContent,
-                        sharedTransitionScope = this@SharedTransitionLayout
+                items[position]?.let {
+                    pictureItem(
+                        item = it,
+                        width = width / 2,
+                        height = height / 3,
+                        onClick = itemClicked,
                     )
                 }
 
             }
 
         }
+    }
 
     }
 
@@ -249,7 +205,7 @@ private fun DetailContent(
                     )
                     .fillMaxWidth()
                     .height(height - 30.dp),
-                placeholder = painterResource(R.drawable.x1000),
+                placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
                 model = item.posterUrl,
                 contentDescription = "Some descr",
                 contentScale = ContentScale.Crop
@@ -303,8 +259,8 @@ private fun MainContent(
                     width = width / 2,
                     height = height / 3,
                     onClick = onClick,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedVisibilityScope = animatedVisibilityScope,
+//                    sharedTransitionScope = sharedTransitionScope,
+//                    animatedVisibilityScope = animatedVisibilityScope,
                 )
             }
 
@@ -320,12 +276,10 @@ fun pictureItem(
     item: FilmsCollectionsDto.Item,
     width: Dp,
     height: Dp,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope,
+//    sharedTransitionScope: SharedTransitionScope,
+//    animatedVisibilityScope: AnimatedVisibilityScope,
     onClick: (FilmsCollectionsDto.Item) -> Unit = {},
 ) {
-
-    with(sharedTransitionScope) {
 
         Column(
             modifier = Modifier.size(
@@ -335,16 +289,16 @@ fun pictureItem(
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .sharedElement(
-                        rememberSharedContentState(key = item.kinopoiskId ?: 0),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
+//                    .sharedElement(
+//                        rememberSharedContentState(key = item.kinopoiskId ?: 0),
+//                        animatedVisibilityScope = animatedVisibilityScope
+//                    )
                     .fillMaxWidth()
                     .clickable {
                         onClick.invoke(item)
                     }
                     .height(height - 30.dp),
-                placeholder = painterResource(R.drawable.x1000),
+                placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
                 model = item.posterUrl,
                 contentDescription = "Some descr",
                 contentScale = ContentScale.Crop
@@ -354,7 +308,7 @@ fun pictureItem(
                 modifier = Modifier.padding(top = 8.dp),
                 text = item.nameRu.orEmpty()
             )
-        }
+
     }
 }
 

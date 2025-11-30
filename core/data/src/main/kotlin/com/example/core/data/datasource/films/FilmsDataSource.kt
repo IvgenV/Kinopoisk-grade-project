@@ -3,6 +3,8 @@ package com.example.core.data.datasource.films
 import androidx.paging.PagingData
 import com.example.core.data.model.dto.FilmsCollectionsDto
 import com.example.core.data.model.dto.PremierItemDto
+import com.example.core.data.model.response.FilmDetailResponse
+import com.example.core.data.model.response.PostersResponse
 import kotlinx.coroutines.flow.Flow
 
 interface FilmsDataSource {
@@ -11,5 +13,8 @@ interface FilmsDataSource {
 
     suspend fun getFilmsPremieres(year: Int, month: String): List<PremierItemDto>
 
+    suspend fun getFilmDetail(id: Int):  Flow<FilmDetailResponse>
+
+    suspend fun getFilmPoster(id: Int, type: String): Flow<PostersResponse>
 
 }
