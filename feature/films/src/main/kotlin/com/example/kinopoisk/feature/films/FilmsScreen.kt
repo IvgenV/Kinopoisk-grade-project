@@ -48,7 +48,6 @@ import com.example.core.data.model.dto.FilmsCollectionsDto
 @Composable
 fun FilmsRoute(
     viewModel: FilmsViewModel = hiltViewModel(),
-    screenType: String,
     resultState: String = "",
     toBottomShet: () -> Unit = {},
     itemClicked: (FilmsCollectionsDto.Item) -> Unit,
@@ -60,7 +59,7 @@ fun FilmsRoute(
     val height = remember { conf.screenHeightDp.dp }
 
     val items: LazyPagingItems<FilmsCollectionsDto.Item> =
-        viewModel.getFilms(screenType).collectAsLazyPagingItems()
+        viewModel.films.collectAsLazyPagingItems()
 
     var showDetails by remember {
         mutableStateOf(false)

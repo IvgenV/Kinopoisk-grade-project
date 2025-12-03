@@ -41,6 +41,7 @@ import com.example.kinopoisk.feature.films.FilmsCollection
 import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
 import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
+import com.example.kinopoisk.feature.films.FilmsViewModel
 import com.example.kinopoisk.feature.premieres.PremiersRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
@@ -134,6 +135,13 @@ class MainActivity : ComponentActivity() {
                                     val result =
                                         resultStore.getResultState<FilmsCollection?>()
                                             ?: TOP_POPULAR_ALL
+
+                                    val viewModel = hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
+                                        creationCallback = { factory ->
+                                            factory.create(result.name)
+                                        }
+                                    )
+
                                     FilmsRoute(
                                         screenType = result.name,
                                         resultState = result.name,

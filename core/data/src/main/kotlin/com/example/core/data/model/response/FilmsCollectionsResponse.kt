@@ -9,11 +9,7 @@ import com.squareup.moshi.JsonClass
 class FilmsCollectionsResponse(
     @Json(name = "items")
     val items: List<Item?>? = null,
-    @Json(name = "total")
-    val total: Int? = null,
-    @Json(name = "totalPages")
-    val totalPages: Int? = null
-) {
+): BasePagingResponse() {
     @JsonClass(generateAdapter = true)
     class Item(
         @Json(name = "countries")

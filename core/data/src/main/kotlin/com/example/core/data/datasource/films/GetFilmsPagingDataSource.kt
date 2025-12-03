@@ -1,4 +1,4 @@
-package com.example.core.data.datasource.paging
+package com.example.core.data.datasource.films
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -10,7 +10,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
-class GetFilmsPagingFataSource @AssistedInject constructor(
+class GetFilmsPagingDataSource @AssistedInject constructor(
     private val movieApi: MovieService,
     @Assisted
     private val type: String
@@ -47,8 +47,8 @@ class GetFilmsPagingFataSource @AssistedInject constructor(
 }
 
 @AssistedFactory
-interface PagingDataSourceFactory {
+interface GetFilmsPagingDataSourceFactory {
     fun create(
         type: String
-    ): GetFilmsPagingFataSource
+    ): GetFilmsPagingDataSource
 }

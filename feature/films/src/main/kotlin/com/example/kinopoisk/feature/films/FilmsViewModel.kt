@@ -2,19 +2,29 @@ package com.example.kinopoisk.feature.films
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.core.data.model.dto.FilmsCollectionsDto
 import com.example.core.data.repository.films.FilmsRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
-@HiltViewModel
-class FilmsViewModel @Inject constructor(
-    private val filmsRepository: FilmsRepository
+@HiltViewModel(assistedFactory = FilmsViewModel.Factory::class)
+class FilmsViewModel @AssistedInject constructor(
+    @Assisted screenType: String,
+    filmsRepository: FilmsRepository
 ) : ViewModel() {
 
-    fun getFilms(screenType: String) = filmsRepository.getFilmsCollections(
-        1,
+    val films: Flow<PagingData<FilmsCollectionsDto.Item>> = filmsRepository.getFilmsCollections(
         screenType
     ).cachedIn(viewModelScope)
+
+    @AssistedFactory
+    interface Factory {
+        fun create(screenType: String): FilmsViewModel
+    }
 
 }

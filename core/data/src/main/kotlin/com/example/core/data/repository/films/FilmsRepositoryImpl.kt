@@ -2,10 +2,11 @@ package com.example.core.data.repository.films
 
 import androidx.paging.PagingData
 import com.example.core.data.datasource.films.FilmsDataSource
+import com.example.core.data.model.dto.FilmImages
 import com.example.core.data.model.dto.FilmsCollectionsDto
 import com.example.core.data.model.dto.PremierItemDto
 import com.example.core.data.model.response.FilmDetailResponse
-import com.example.core.data.model.response.PostersResponse
+import com.example.core.data.model.response.ImagesResponseDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -14,10 +15,9 @@ class FilmsRepositoryImpl @Inject constructor(
 ) : FilmsRepository {
 
     override fun getFilmsCollections(
-        page: Int,
         type: String
     ): Flow<PagingData<FilmsCollectionsDto.Item>> {
-        return filmsDataSource.getFilmsCollections(page, type)
+        return filmsDataSource.getFilmsCollections(type)
     }
 
     override suspend fun getFilmsPremieres(year: Int, month: String): List<PremierItemDto> {
@@ -28,8 +28,17 @@ class FilmsRepositoryImpl @Inject constructor(
         return filmsDataSource.getFilmDetail(id)
     }
 
-    override suspend fun getFilmPoster(id: Int, type: String): Flow<PostersResponse> {
-        return filmsDataSource.getFilmPoster(id, type)
+    override suspend fun getFilmPoster(id: Int, type: String): Flow<List<FilmImages.FilmsItem>>  {
+        return filmsDataSource.getFilmImages(id, type)
+    }
+
+    override fun getFilmImagesPaging(
+        filmId: Int,
+        type: String
+    ): Flow<PagingData<FilmImages.FilmsItem>> {
+        return filmsDataSource.getFilmImagesPaging(
+            filmId = filmId, type = type
+        )
     }
 
 }
