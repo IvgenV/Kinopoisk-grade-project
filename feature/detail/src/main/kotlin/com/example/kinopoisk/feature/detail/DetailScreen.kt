@@ -3,6 +3,7 @@ package com.example.kinopoisk.feature.detail
 import android.content.res.Configuration
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -43,13 +43,16 @@ import com.example.kinopoisk.core.base.R as BaseRes
 
 @Composable
 fun DetailsScreenRoute(
-    viewModel: DetailsScreenViewModel = hiltViewModel()
+    viewModel: DetailsScreenViewModel = hiltViewModel(),
+    toAllFilmImages: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
 
     DetailScreen(
-        uiState = uiState
+        uiState = uiState,
+        kinopoiskFilmId = viewModel.kinopoiskId,
+        toAllFilmImages = toAllFilmImages
     )
 
 
@@ -58,7 +61,9 @@ fun DetailsScreenRoute(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DetailScreen(
-    uiState: DetailsScreenState
+    uiState: DetailsScreenState,
+    kinopoiskFilmId: Int,
+    toAllFilmImages: (Int) -> Unit,
 ) {
 
     val conf = LocalConfiguration.current
@@ -186,9 +191,11 @@ fun DetailScreen(
         }
 
         item {
-            Column{
+            Column {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -197,6 +204,9 @@ fun DetailScreen(
                     )
                     Spacer(Modifier.weight(1f))
                     Text(
+                        modifier = Modifier.clickable {
+                            toAllFilmImages.invoke(kinopoiskFilmId)
+                        },
                         text = "Все",
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
@@ -240,7 +250,9 @@ private fun DetailScreenPreview() {
                 description = "1980-е годы, тихий провинциальный американский городок. Благоприятное течение местной жизни нарушает загадочное исчезновение подростка по имени Уилл. Выяснить обстоятельства дела полны решимости родные мальчика и местный шериф, также события затрагивают лучшего друга Уилла – Майка. Он начинает собственное расследование. Майк уверен, что близок к разгадке, и теперь ему предстоит оказаться в эпицентре ожесточенной битвы потусторонних сил.",
                 year = 2022,
                 genres = listOf("криминал", "детектив")
-            )
+            ),
+            kinopoiskFilmId = 0,
+            toAllFilmImages = { },
         )
     }
 }

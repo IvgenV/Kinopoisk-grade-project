@@ -16,10 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -36,10 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.ItemSnapshotList
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.example.core.data.model.dto.FilmsCollectionsDto
 
@@ -70,6 +66,16 @@ fun FilmsRoute(
     }
 
     val scrollState = rememberLazyGridState()
+
+
+//    FilmsScreen(
+//        items = items,
+//        width = width,
+//        height = height,
+//        resultState = resultState,
+//        toBottomShet = toBottomShet
+//    )
+
 
     Column(
         modifier = Modifier
@@ -112,22 +118,13 @@ fun FilmsRoute(
         }
     }
 
-    }
-
-
-//    FilmsScreen(
-//        items = items.itemSnapshotList,
-//        width = width,
-//        height = height,
-//        resultState = resultState,
-//        toBottomShet = toBottomShet
-//    )
+}
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun FilmsScreen(
-    items: ItemSnapshotList<FilmsCollectionsDto.Item>,
+    items: LazyPagingItems<FilmsCollectionsDto.Item>,
     width: Dp,
     height: Dp,
     resultState: String,
@@ -218,7 +215,7 @@ private fun DetailContent(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun MainContent(
-    items: ItemSnapshotList<FilmsCollectionsDto.Item>,
+    items: LazyPagingItems<FilmsCollectionsDto.Item>,
     width: Dp,
     height: Dp,
     onClick: (FilmsCollectionsDto.Item) -> Unit,
@@ -250,17 +247,18 @@ private fun MainContent(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
-            items(
-                items = items.items,
-            ) {
-                pictureItem(
-                    item = it,
-                    width = width / 2,
-                    height = height / 3,
-                    onClick = onClick,
-//                    sharedTransitionScope = sharedTransitionScope,
-//                    animatedVisibilityScope = animatedVisibilityScope,
-                )
+            items(items.itemCount) { index ->
+                items[index]?.let {
+                    pictureItem(
+                        item = it,
+                        width = width / 2,
+                        height = height / 3,
+                        onClick = onClick,
+//                        sharedTransitionScope = sharedTransitionScope,
+//                        animatedVisibilityScope = animatedVisibilityScope,
+                    )
+                }
+
             }
 
         }
@@ -280,33 +278,35 @@ fun pictureItem(
     onClick: (FilmsCollectionsDto.Item) -> Unit = {},
 ) {
 
-        Column(
-            modifier = Modifier.size(
-                height = height,
-                width = width
-            )
-        ) {
-            AsyncImage(
-                modifier = Modifier
+    Column(
+        modifier = Modifier.size(
+            height = height,
+            width = width
+        )
+    ) {
+
+
+        AsyncImage(
+            modifier = Modifier
 //                    .sharedElement(
 //                        rememberSharedContentState(key = item.kinopoiskId ?: 0),
 //                        animatedVisibilityScope = animatedVisibilityScope
 //                    )
-                    .fillMaxWidth()
-                    .clickable {
-                        onClick.invoke(item)
-                    }
-                    .height(height - 30.dp),
-                placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
-                model = item.posterUrl,
-                contentDescription = "Some descr",
-                contentScale = ContentScale.Crop
-            )
+                .fillMaxWidth()
+                .clickable {
+                    onClick.invoke(item)
+                }
+                .height(height - 30.dp),
+            placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
+            model = item.posterUrl,
+            contentDescription = "Some descr",
+            contentScale = ContentScale.Crop
+        )
 
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = item.nameRu.orEmpty()
-            )
+        Text(
+            modifier = Modifier.padding(top = 8.dp),
+            text = item.nameRu.orEmpty()
+        )
 
     }
 }

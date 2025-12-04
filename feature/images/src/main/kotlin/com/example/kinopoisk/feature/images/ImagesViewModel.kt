@@ -8,12 +8,13 @@ import com.example.core.data.model.dto.FilmImages
 import com.example.core.data.repository.films.FilmsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 
 @HiltViewModel(assistedFactory = ImagesViewModel.Factory::class)
-class ImagesViewModel @Inject constructor(
+class ImagesViewModel @AssistedInject constructor(
     @Assisted val filmId: Int,
     private val repository: FilmsRepository
 ) : ViewModel() {

@@ -7,7 +7,7 @@ androidTools = "31.9.0"
 androidxActivity = "1.9.3"
 androidxAppCompat = "1.7.0"
 androidxBrowser = "1.8.0"
-androidxComposeBom = "2025.02.00"
+androidxComposeBom = "2025.11.01"
 androidxComposeFoundation = "1.8.0-alpha07"
 androidxComposeMaterial3Adaptive = "1.1.0-rc01"
 androidxComposeRuntimeTracing = "1.7.6"
@@ -70,6 +70,7 @@ navigation3 = "1.0.0"
 lifecycleViewmodel = "2.10.0"
 paging_version="3.3.6"
 credentials = "1.5.0"
+foundationLayout = "1.9.5"
 
 [bundles]
 androidx-compose-ui-test = ["androidx-compose-ui-test", "androidx-compose-ui-testManifest"]
@@ -91,6 +92,7 @@ androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adap
 androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
+
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-runtime-tracing = { group = "androidx.compose.runtime", name = "runtime-tracing", version.ref = "androidxComposeRuntimeTracing" }
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
@@ -186,6 +188,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

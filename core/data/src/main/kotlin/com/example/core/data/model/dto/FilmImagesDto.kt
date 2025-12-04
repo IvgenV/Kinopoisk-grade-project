@@ -9,6 +9,7 @@ data class FilmImages(
     @Immutable
     data class FilmsItem(
         val imageUrl: String? = null,
-        val previewUrl: String? = null
+        val previewUrl: String? = null,
+        val id: Int? = null,
     )
 }

@@ -55,6 +55,7 @@ dependencies {
     implementation(projects.feature.films)
     implementation(projects.feature.premieres)
     implementation(projects.feature.detail)
+    implementation(projects.feature.images)
     implementation(projects.core.data)
     implementation(projects.core.base)
 

@@ -42,6 +42,8 @@ import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
 import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
 import com.example.kinopoisk.feature.films.FilmsViewModel
+import com.example.kinopoisk.feature.images.ImagesRoute
+import com.example.kinopoisk.feature.images.ImagesViewModel
 import com.example.kinopoisk.feature.premieres.PremiersRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
@@ -60,6 +62,9 @@ private data object Premiers : TopLevelRoute {
 
 @Serializable
 private data class FilmsDetail(val kinopoiskId: Int) : NavKey
+
+@Serializable
+private data class FilmImages(val kinopoiskId: Int) : NavKey
 
 private data object Filter : NavKey
 
@@ -136,20 +141,24 @@ class MainActivity : ComponentActivity() {
                                         resultStore.getResultState<FilmsCollection?>()
                                             ?: TOP_POPULAR_ALL
 
-                                    val viewModel = hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
-                                        creationCallback = { factory ->
-                                            factory.create(result.name)
-                                        }
-                                    )
+                                    val viewModel =
+                                        hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
+                                            creationCallback = { factory ->
+                                                factory.create(result.name)
+                                            }
+                                        )
 
                                     FilmsRoute(
-                                        screenType = result.name,
                                         resultState = result.name,
                                         toBottomShet = {
                                             topLevelBackStack.add(Filter)
                                         },
                                         itemClicked = { item ->
-                                            topLevelBackStack.add(FilmsDetail(item.kinopoiskId ?: 0))
+                                            topLevelBackStack.add(
+                                                FilmsDetail(
+                                                    item.kinopoiskId ?: 0
+                                                )
+                                            )
                                         }
                                     )
                                 }
@@ -178,15 +187,38 @@ class MainActivity : ComponentActivity() {
 
                                     showBottomBar = false
 
-                                    val viewModel = hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
-                                        creationCallback = { factory ->
-                                            factory.create(key.kinopoiskId)
-                                        }
-                                    )
+                                    val viewModel =
+                                        hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
+                                            creationCallback = { factory ->
+                                                factory.create(key.kinopoiskId)
+                                            }
+                                        )
 
                                     DetailsScreenRoute(
+                                        viewModel,
+                                        toAllFilmImages = { kinopoiskFilmId ->
+                                            topLevelBackStack.add(
+                                                FilmImages(
+                                                    kinopoiskFilmId
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+
+                                is FilmImages -> NavEntry(key) {
+
+                                    val viewModel =
+                                        hiltViewModel<ImagesViewModel, ImagesViewModel.Factory>(
+                                            creationCallback = { factory ->
+                                                factory.create(key.kinopoiskId)
+                                            }
+                                        )
+
+                                    ImagesRoute(
                                         viewModel
                                     )
+
                                 }
 
                                 else -> error("Unknown route: $key")
