@@ -10,10 +10,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
-class GetFilmsPagingDataSource @AssistedInject constructor(
+class GetFilmsCollectionsPagingDataSource @AssistedInject constructor(
     private val movieApi: MovieService,
     @Assisted
-    private val queryParams: Map<String, Any>
+    private val type: String
 ) : PagingSource<Int, FilmsByFiltersDomain.ItemDomain>() {
 
     var maxPage: Int? = null
@@ -22,8 +22,9 @@ class GetFilmsPagingDataSource @AssistedInject constructor(
         return try {
             val nextPage = params.key ?: INITIAL_PAGE_NO
 
-            val response = movieApi.films(
-                params = queryParams
+            val response = movieApi.getFilmsCollections(
+                page = nextPage,
+                type = type
             )
 
             if (maxPage == null) {
@@ -51,8 +52,8 @@ class GetFilmsPagingDataSource @AssistedInject constructor(
 }
 
 @AssistedFactory
-interface GetFilmsPagingDataSourceFactory {
+interface GetFilmsCollectionsPagingDataSourceFactory {
     fun create(
-        queryParams: Map<String, Any>
-    ): GetFilmsPagingDataSource
+        type: String
+    ): GetFilmsCollectionsPagingDataSource
 }

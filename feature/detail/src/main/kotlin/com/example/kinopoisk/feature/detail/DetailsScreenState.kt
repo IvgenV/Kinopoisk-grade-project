@@ -11,7 +11,7 @@ data class DetailsScreenState(
     val ratingKinopoisk: Double = 0.0,
     val ratingKinopoiskVoteCount: Int = 0,
     val nameOriginal: String = "",
-    val country: String? = null,
+    val country: List<String> = emptyList(),
     val filmDuration: String? = null,
     val description: String? = null,
     val year: Int? = null,

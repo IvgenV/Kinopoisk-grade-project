@@ -2,11 +2,11 @@ package com.example.core.data.repository.films
 
 import androidx.paging.PagingData
 import com.example.core.data.datasource.films.FilmsDataSource
+import com.example.core.data.model.dto.FilmFilter
 import com.example.core.data.model.dto.FilmImages
-import com.example.core.data.model.dto.FilmsCollectionsDto
+import com.example.core.data.model.dto.FilmsByFiltersDomain
 import com.example.core.data.model.dto.PremierItemDto
 import com.example.core.data.model.response.FilmDetailResponse
-import com.example.core.data.model.response.ImagesResponseDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class FilmsRepositoryImpl @Inject constructor(
 
     override fun getFilmsCollections(
         type: String
-    ): Flow<PagingData<FilmsCollectionsDto.Item>> {
+    ): Flow<PagingData<FilmsByFiltersDomain.ItemDomain>> {
         return filmsDataSource.getFilmsCollections(type)
     }
 
@@ -39,6 +39,14 @@ class FilmsRepositoryImpl @Inject constructor(
         return filmsDataSource.getFilmImagesPaging(
             filmId = filmId, type = type
         )
+    }
+
+    override fun getFilmFilters(): Flow<FilmFilter> {
+        return filmsDataSource.getFilmFilters()
+    }
+
+    override fun getFilms(queryParams: Map<String, Any>): Flow<PagingData<FilmsByFiltersDomain.ItemDomain>> {
+        return filmsDataSource.getFilms(queryParams)
     }
 
 }

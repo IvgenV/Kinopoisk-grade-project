@@ -33,11 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.example.core.data.model.dto.FilmsCollectionsDto
+import com.example.core.data.model.dto.FilmsByFiltersDomain
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -46,7 +46,7 @@ fun FilmsRoute(
     viewModel: FilmsViewModel = hiltViewModel(),
     resultState: String = "",
     toBottomShet: () -> Unit = {},
-    itemClicked: (FilmsCollectionsDto.Item) -> Unit,
+    itemClicked: (FilmsByFiltersDomain.ItemDomain) -> Unit,
 ) {
 
     val conf = LocalConfiguration.current
@@ -54,14 +54,14 @@ fun FilmsRoute(
     val width = remember { conf.screenWidthDp.dp }
     val height = remember { conf.screenHeightDp.dp }
 
-    val items: LazyPagingItems<FilmsCollectionsDto.Item> =
+    val items: LazyPagingItems<FilmsByFiltersDomain.ItemDomain> =
         viewModel.films.collectAsLazyPagingItems()
 
     var showDetails by remember {
         mutableStateOf(false)
     }
 
-    var selectedItem: FilmsCollectionsDto.Item? by remember {
+    var selectedItemDomain: FilmsByFiltersDomain.ItemDomain? by remember {
         mutableStateOf(null)
     }
 
@@ -106,7 +106,7 @@ fun FilmsRoute(
 
                 items[position]?.let {
                     pictureItem(
-                        item = it,
+                        itemDomain = it,
                         width = width / 2,
                         height = height / 3,
                         onClick = itemClicked,
@@ -124,7 +124,7 @@ fun FilmsRoute(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 internal fun FilmsScreen(
-    items: LazyPagingItems<FilmsCollectionsDto.Item>,
+    items: LazyPagingItems<FilmsByFiltersDomain.ItemDomain>,
     width: Dp,
     height: Dp,
     resultState: String,
@@ -135,7 +135,7 @@ internal fun FilmsScreen(
         mutableStateOf(false)
     }
 
-    var selectedItem: FilmsCollectionsDto.Item? by remember {
+    var selectedItemDomain: FilmsByFiltersDomain.ItemDomain? by remember {
         mutableStateOf(null)
     }
 
@@ -152,7 +152,7 @@ internal fun FilmsScreen(
                     width = width,
                     height = height,
                     onClick = {
-                        selectedItem = it
+                        selectedItemDomain = it
                         showDetails = true
                     },
                     animatedVisibilityScope = this@AnimatedContent,
@@ -163,7 +163,7 @@ internal fun FilmsScreen(
                 DetailContent(
                     width = width,
                     height = height,
-                    item = selectedItem!!,
+                    itemDomain = selectedItemDomain!!,
                     animatedVisibilityScope = this@AnimatedContent,
                     sharedTransitionScope = this@SharedTransitionLayout
                 )
@@ -180,7 +180,7 @@ internal fun FilmsScreen(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun DetailContent(
-    item: FilmsCollectionsDto.Item,
+    itemDomain: FilmsByFiltersDomain.ItemDomain,
     width: Dp,
     height: Dp,
     sharedTransitionScope: SharedTransitionScope,
@@ -196,13 +196,13 @@ private fun DetailContent(
             AsyncImage(
                 modifier = Modifier
                     .sharedElement(
-                        rememberSharedContentState(key = item.kinopoiskId ?: 0),
+                        rememberSharedContentState(key = itemDomain.kinopoiskId ?: 0),
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                     .fillMaxWidth()
                     .height(height - 30.dp),
                 placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
-                model = item.posterUrl,
+                model = itemDomain.posterUrl,
                 contentDescription = "Some descr",
                 contentScale = ContentScale.Crop
             )
@@ -215,10 +215,10 @@ private fun DetailContent(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun MainContent(
-    items: LazyPagingItems<FilmsCollectionsDto.Item>,
+    items: LazyPagingItems<FilmsByFiltersDomain.ItemDomain>,
     width: Dp,
     height: Dp,
-    onClick: (FilmsCollectionsDto.Item) -> Unit,
+    onClick: (FilmsByFiltersDomain.ItemDomain) -> Unit,
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -250,7 +250,7 @@ private fun MainContent(
             items(items.itemCount) { index ->
                 items[index]?.let {
                     pictureItem(
-                        item = it,
+                        itemDomain = it,
                         width = width / 2,
                         height = height / 3,
                         onClick = onClick,
@@ -270,12 +270,12 @@ private fun MainContent(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun pictureItem(
-    item: FilmsCollectionsDto.Item,
+    itemDomain: FilmsByFiltersDomain.ItemDomain,
     width: Dp,
     height: Dp,
 //    sharedTransitionScope: SharedTransitionScope,
 //    animatedVisibilityScope: AnimatedVisibilityScope,
-    onClick: (FilmsCollectionsDto.Item) -> Unit = {},
+    onClick: (FilmsByFiltersDomain.ItemDomain) -> Unit = {},
 ) {
 
     Column(
@@ -294,18 +294,18 @@ fun pictureItem(
 //                    )
                 .fillMaxWidth()
                 .clickable {
-                    onClick.invoke(item)
+                    onClick.invoke(itemDomain)
                 }
                 .height(height - 30.dp),
             placeholder = painterResource(com.example.kinopoisk.core.base.R.drawable.kinopoisk_poster_preview),
-            model = item.posterUrl,
+            model = itemDomain.posterUrl,
             contentDescription = "Some descr",
             contentScale = ContentScale.Crop
         )
 
         Text(
             modifier = Modifier.padding(top = 8.dp),
-            text = item.nameRu.orEmpty()
+            text = itemDomain.nameRu.orEmpty()
         )
 
     }

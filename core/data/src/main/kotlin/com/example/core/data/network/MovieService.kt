@@ -1,12 +1,14 @@
 package com.example.core.data.network
 
 import com.example.core.data.model.response.FilmDetailResponse
-import com.example.core.data.model.response.FilmsCollectionsResponse
+import com.example.core.data.model.response.FilmFilterDto
+import com.example.core.data.model.response.FilmsByFiltersDto
 import com.example.core.data.model.response.FilmsPremieresResponse
 import com.example.core.data.model.response.ImagesResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface MovieService {
 
@@ -14,7 +16,7 @@ interface MovieService {
     suspend fun getFilmsCollections(
         @Query("page") page: Int,
         @Query("type") type: String,
-    ): FilmsCollectionsResponse
+    ): FilmsByFiltersDto
 
     @GET("/api/v2.2/films/premieres")
     suspend fun getPremieres(
@@ -33,5 +35,13 @@ interface MovieService {
         @Query("page") page: Int = 1,
         @Query("type") type: String,
     ): ImagesResponseDto
+
+    @GET("/api/v2.2/films/filters")
+    suspend fun getFilmsFilters(): FilmFilterDto
+
+    @GET("/api/v2.2/films")
+    suspend fun films(
+        @QueryMap params: Map<String, Any>
+    ): FilmsByFiltersDto
 
 }

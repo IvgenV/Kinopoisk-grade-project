@@ -1,7 +1,5 @@
 package com.example.core.data.model.dto
 
-
-
 data class PremierItemDto(
     val countries: List<Country?> = emptyList(),
     val duration: Int? = null,

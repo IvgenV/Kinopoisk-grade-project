@@ -3,15 +3,13 @@ package com.example.core.data.model.dto
 import androidx.compose.runtime.Immutable
 
 @Immutable
-data class FilmsCollectionsDto(
-    val items: List<Item?> = emptyList(),
-    val total: Int = 0,
-    val totalPages: Int = 0
+data class FilmsByFiltersDomain(
+    val itemDomains: List<ItemDomain?> = emptyList(),
 ) {
     @Immutable
-    class Item(
-        val countries: List<Country?> = emptyList(),
-        val genres: List<Genre?> = emptyList(),
+    class ItemDomain(
+        val countries: List<CountryDomain?> = emptyList(),
+        val genreDomains: List<GenreDomain?> = emptyList(),
         val kinopoiskId: Int? = null,
         val nameEn: String? = null,
         val nameOriginal: String? = null,
@@ -24,12 +22,12 @@ data class FilmsCollectionsDto(
         val year: String? = null
     ) {
         @Immutable
-        class Country(
+        class CountryDomain(
             val country: String? = null
         )
 
         @Immutable
-        class Genre(
+        class GenreDomain(
             val genre: String? = null
         )
     }

@@ -2,11 +2,12 @@ import com.example.kinopoisk.NiaBuildType
 
 plugins {
     alias(libs.plugins.nowinandroid.android.application)
+    //alias(libs.plugins.android.application)
     alias(libs.plugins.nowinandroid.android.application.compose)
     alias(libs.plugins.nowinandroid.android.application.flavors)
     alias(libs.plugins.nowinandroid.android.application.jacoco)
     alias(libs.plugins.nowinandroid.hilt)
-    id("com.google.android.gms.oss-licenses-plugin")
+    //id("com.google.android.gms.oss-licenses-plugin")
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.kotlin.serialization)
@@ -56,6 +57,7 @@ dependencies {
     implementation(projects.feature.premieres)
     implementation(projects.feature.detail)
     implementation(projects.feature.images)
+    implementation(projects.feature.search)
     implementation(projects.core.data)
     implementation(projects.core.base)
 

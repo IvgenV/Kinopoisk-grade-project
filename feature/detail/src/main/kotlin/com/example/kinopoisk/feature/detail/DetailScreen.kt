@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.kinopoisk.core.base.theme.KinopoiskTheme
 import com.example.kinopoisk.core.base.R as BaseRes
@@ -137,7 +137,7 @@ fun DetailScreen(
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    text = "${uiState.nameOriginal}"
+                    text = uiState.nameOriginal
                 )
             }
             Row(
@@ -167,11 +167,17 @@ fun DetailScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(end = 4.dp),
-                    text = uiState.country.orEmpty()
-                )
+                uiState.country.forEachIndexed { index, country ->
+                    Text(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(end = 4.dp),
+                        text = if (uiState.country.lastIndex == index) {
+                            country
+                        } else {
+                            "${country}, "
+                        }
+                    )
+                }
                 Text(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 4.dp),
@@ -245,7 +251,7 @@ private fun DetailScreenPreview() {
                 logoUrl = "sdsf",
                 ratingKinopoisk = 8.0,
                 ratingKinopoiskVoteCount = 107000,
-                country = "USA",
+                country = listOf("USA", "Britain", "Italy"),
                 filmDuration = "2ч 55м",
                 description = "1980-е годы, тихий провинциальный американский городок. Благоприятное течение местной жизни нарушает загадочное исчезновение подростка по имени Уилл. Выяснить обстоятельства дела полны решимости родные мальчика и местный шериф, также события затрагивают лучшего друга Уилла – Майка. Он начинает собственное расследование. Майк уверен, что близок к разгадке, и теперь ему предстоит оказаться в эпицентре ожесточенной битвы потусторонних сил.",
                 year = 2022,

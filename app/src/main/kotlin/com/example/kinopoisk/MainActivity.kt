@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -28,7 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -45,6 +46,7 @@ import com.example.kinopoisk.feature.films.FilmsViewModel
 import com.example.kinopoisk.feature.images.ImagesRoute
 import com.example.kinopoisk.feature.images.ImagesViewModel
 import com.example.kinopoisk.feature.premieres.PremiersRoute
+import com.example.kinopoisk.feature.search.SearchRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
@@ -60,6 +62,10 @@ private data object Premiers : TopLevelRoute {
     override val icon = Icons.Default.Face
 }
 
+private data object Search: TopLevelRoute {
+    override val icon: ImageVector = Icons.Default.Search
+}
+
 @Serializable
 private data class FilmsDetail(val kinopoiskId: Int) : NavKey
 
@@ -68,7 +74,7 @@ private data class FilmImages(val kinopoiskId: Int) : NavKey
 
 private data object Filter : NavKey
 
-private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Films, Premiers)
+private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Films, Premiers, Search)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -79,7 +85,6 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val topLevelBackStack = remember { TopLevelBackStack<NavKey>(Films) }
-
 
             val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
@@ -166,6 +171,12 @@ class MainActivity : ComponentActivity() {
                                 is Premiers -> NavEntry(key) {
                                     showBottomBar = true
                                     PremiersRoute()
+                                }
+
+                                is Filter -> NavEntry(key) {
+                                    SearchRoute(
+                                        hiltViewModel()
+                                    )
                                 }
 
                                 is Filter -> NavEntry(

@@ -13,13 +13,13 @@ buildscript {
         mavenCentral()
 
         // This is used only for internal Google builds.
-        maven { url = uri("../nowinandroid-prebuilts/m2repository") }
+        //maven { url = uri("../nowinandroid-prebuilts/m2repository") }
     }
-    dependencies {
-        classpath(libs.google.oss.licenses.plugin) {
-            exclude(group = "com.google.protobuf")
-        }
-    }
+//    dependencies {
+//        classpath(libs.google.oss.licenses.plugin) {
+//            exclude(group = "com.google.protobuf")
+//        }
+//    }
 
 }
 
