@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.nowinandroid.android.library)
     alias(libs.plugins.nowinandroid.hilt)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlinx-serialization")
+    id("kotlin-parcelize")
 }
 
 android {

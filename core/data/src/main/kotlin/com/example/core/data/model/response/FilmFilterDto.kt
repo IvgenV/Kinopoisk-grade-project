@@ -30,8 +30,9 @@ data class FilmFilterDto(
 }
 
 fun FilmFilterDto.toDomain() = FilmFilter(
-    countries = countries?.filterNotNull()?.map { it.toDomain() }.orEmpty(),
-    genres = genres?.filterNotNull()?.map { it.toDomain() }.orEmpty(),
+    countries = countries?.filterNotNull()?.map { it.toDomain() }.orEmpty()
+        .toCollection(ArrayList()),
+    genres = genres?.filterNotNull()?.map { it.toDomain() }.orEmpty().toCollection(ArrayList()),
 )
 
 fun FilmFilterDto.Genre.toDomain() = FilmFilter.Genre(

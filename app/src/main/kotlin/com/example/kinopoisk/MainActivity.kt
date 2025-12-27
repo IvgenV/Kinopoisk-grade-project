@@ -38,15 +38,14 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.kinopoisk.core.base.theme.KinopoiskTheme
 import com.example.kinopoisk.feature.detail.DetailsScreenRoute
 import com.example.kinopoisk.feature.detail.DetailsScreenViewModel
-import com.example.kinopoisk.feature.films.FilmsCollection
-import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
-import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
 import com.example.kinopoisk.feature.films.FilmsViewModel
 import com.example.kinopoisk.feature.images.ImagesRoute
 import com.example.kinopoisk.feature.images.ImagesViewModel
 import com.example.kinopoisk.feature.premieres.PremiersRoute
 import com.example.kinopoisk.feature.search.SearchRoute
+import com.example.kinopoisk.feature.search.data.SearchFilterUiState
+import com.example.kinopoisk.feature.search.filter.SearchFilterRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
@@ -62,7 +61,7 @@ private data object Premiers : TopLevelRoute {
     override val icon = Icons.Default.Face
 }
 
-private data object Search: TopLevelRoute {
+private data object Search : TopLevelRoute {
     override val icon: ImageVector = Icons.Default.Search
 }
 
@@ -72,7 +71,8 @@ private data class FilmsDetail(val kinopoiskId: Int) : NavKey
 @Serializable
 private data class FilmImages(val kinopoiskId: Int) : NavKey
 
-private data object Filter : NavKey
+@Serializable
+private data class SearchBottomSheet(val filtersForSearch: SearchFilterUiState) : NavKey
 
 private val TOP_LEVEL_ROUTES: List<TopLevelRoute> = listOf(Films, Premiers, Search)
 
@@ -95,7 +95,6 @@ class MainActivity : ComponentActivity() {
             }
 
             KinopoiskTheme {
-
 
                 Scaffold(
                     modifier = Modifier
@@ -142,23 +141,17 @@ class MainActivity : ComponentActivity() {
                             when (key) {
                                 is Films -> NavEntry(key) {
                                     showBottomBar = true
-                                    val result =
-                                        resultStore.getResultState<FilmsCollection?>()
-                                            ?: TOP_POPULAR_ALL
 
                                     val viewModel =
                                         hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
                                             creationCallback = { factory ->
-                                                factory.create(result.name)
+                                                factory.create("TOP_POPULAR_ALL")
                                             }
                                         )
 
                                     FilmsRoute(
-                                        resultState = result.name,
-                                        toBottomShet = {
-                                            topLevelBackStack.add(Filter)
-                                        },
-                                        itemClicked = { item ->
+                                        viewModel = viewModel,
+                                        onItemClicked = { item ->
                                             topLevelBackStack.add(
                                                 FilmsDetail(
                                                     item.kinopoiskId ?: 0
@@ -171,27 +164,6 @@ class MainActivity : ComponentActivity() {
                                 is Premiers -> NavEntry(key) {
                                     showBottomBar = true
                                     PremiersRoute()
-                                }
-
-                                is Filter -> NavEntry(key) {
-                                    SearchRoute(
-                                        hiltViewModel()
-                                    )
-                                }
-
-                                is Filter -> NavEntry(
-                                    key,
-                                    metadata = BottomSheetSceneStrategy.bottomSheet()
-                                ) {
-                                    FilmsFilterScreen(
-                                        selectedFilter = resultStore.getResultState<FilmsCollection?>()
-                                            ?: TOP_POPULAR_ALL
-                                    ) { result ->
-                                        resultStore.setResult<FilmsCollection>(
-                                            result = result
-                                        )
-                                        topLevelBackStack.removeLast()
-                                    }
                                 }
 
                                 is FilmsDetail -> NavEntry(key) {
@@ -230,6 +202,31 @@ class MainActivity : ComponentActivity() {
                                         viewModel
                                     )
 
+                                }
+
+                                is Search -> NavEntry(key) {
+
+                                    val result =
+                                        resultStore.getResultState<SearchFilterUiState?>("SearchBottomSheetResult")
+
+                                    SearchRoute(
+                                        hiltViewModel(),
+                                        toFilterCLick = {
+                                            topLevelBackStack.add(SearchBottomSheet(it))
+                                        }
+                                    )
+                                }
+
+                                is SearchBottomSheet -> NavEntry(
+                                    key,
+                                    metadata = BottomSheetSceneStrategy.bottomSheet()
+                                ) {
+                                    SearchFilterRoute(
+                                        key.filtersForSearch,
+                                    ) {
+                                        resultStore.setResult("SearchBottomSheetResult", it)
+                                        topLevelBackStack.removeLast()
+                                    }
                                 }
 
                                 else -> error("Unknown route: $key")

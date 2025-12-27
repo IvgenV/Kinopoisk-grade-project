@@ -1,27 +1,36 @@
 package com.example.kinopoisk.feature.search
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.compose.LazyPagingItems
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.core.data.model.dto.FilmsByFiltersDomain
+import com.example.kinopoisk.feature.search.components.SearchFilterMainScreen
+import com.example.kinopoisk.feature.search.components.SearchFilterScreen
+import com.example.kinopoisk.feature.search.data.SearchFilterUiState
 
 @Composable
 fun SearchRoute(
-    viewModel: SearchViewModel
+    viewModel: SearchViewModel,
+    toFilterCLick: (SearchFilterUiState) -> Unit
 ) {
 
     val films = viewModel.films.collectAsLazyPagingItems()
 
-    SearchScreen(films)
+    var textRequest by rememberSaveable {
+        mutableStateOf("")
+    }
 
-}
-
-@Composable
-private fun SearchScreen(
-    films: LazyPagingItems<FilmsByFiltersDomain.ItemDomain>
-) {
-
-
+    SearchFilterMainScreen(
+        request = textRequest,
+        onTextChange = {
+            textRequest = it
+        },
+        filterClicked = {
+            toFilterCLick.invoke(viewModel.searchFilterUiState)
+        },
+        films = films
+    )
 
 }

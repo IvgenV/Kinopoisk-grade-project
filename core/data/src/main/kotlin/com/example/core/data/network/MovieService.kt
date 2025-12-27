@@ -40,6 +40,7 @@ interface MovieService {
     suspend fun getFilmsFilters(): FilmFilterDto
 
     @GET("/api/v2.2/films")
+    @JvmSuppressWildcards
     suspend fun films(
         @QueryMap params: Map<String, Any>
     ): FilmsByFiltersDto
