@@ -75,12 +75,9 @@ class FilmsDataSourceImpl @Inject constructor(
         ).flow
     }
 
-    override fun getFilmFilters(): Flow<FilmFilter> {
-        return flow {
-            val response =
-                movieService.getFilmsFilters().toDomain()
-            emit(response)
-        }.flowOn(Dispatchers.IO)
+    override suspend fun getFilmFilters(): FilmFilter {
+        val response =  movieService.getFilmsFilters().toDomain()
+        return response
     }
 
     override fun getFilms(

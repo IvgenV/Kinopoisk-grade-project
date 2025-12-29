@@ -41,7 +41,7 @@ class FilmsRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getFilmFilters(): Flow<FilmFilter> {
+    override suspend fun getFilmFilters(): FilmFilter {
         return filmsDataSource.getFilmFilters()
     }
 

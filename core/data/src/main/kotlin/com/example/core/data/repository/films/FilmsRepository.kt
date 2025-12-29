@@ -20,7 +20,7 @@ interface FilmsRepository {
 
     fun getFilmImagesPaging(filmId: Int, type: String): Flow<PagingData<FilmImages.FilmsItem>>
 
-    fun getFilmFilters(): Flow<FilmFilter>
+    suspend fun getFilmFilters(): FilmFilter
 
     fun getFilms(queryParams: Map<String, Any>): Flow<PagingData<FilmsByFiltersDomain.ItemDomain>>
 
