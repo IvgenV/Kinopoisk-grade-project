@@ -13,10 +13,13 @@ import com.example.kinopoisk.feature.search.data.SearchFilterUiState
 @Composable
 fun SearchRoute(
     viewModel: SearchViewModel,
+    result: SearchFilterUiState?,
     toFilterCLick: (SearchFilterUiState) -> Unit
 ) {
 
     val films = viewModel.films.collectAsLazyPagingItems()
+
+     val localResult = result
 
     var textRequest by rememberSaveable {
         mutableStateOf("")

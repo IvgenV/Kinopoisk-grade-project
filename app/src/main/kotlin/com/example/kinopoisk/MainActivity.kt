@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +31,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.kinopoisk.core.base.theme.KinopoiskTheme
@@ -84,6 +86,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
+            var sdgs by remember {
+                mutableStateOf("")
+            }
+
             val topLevelBackStack = remember { TopLevelBackStack<NavKey>(Films) }
 
             val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
@@ -97,9 +103,7 @@ class MainActivity : ComponentActivity() {
             KinopoiskTheme {
 
                 Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    bottomBar = {
+                    modifier = Modifier.fillMaxSize(), bottomBar = {
                         AnimatedVisibility(
                             visible = showBottomBar,
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
@@ -107,27 +111,118 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavigationBar {
                                 TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
-                                    val isSelected =
-                                        topLevelRoute == topLevelBackStack.topLevelKey
-                                    NavigationBarItem(
-                                        selected = isSelected,
-                                        onClick = {
-                                            topLevelBackStack.addTopLevel(
-                                                topLevelRoute
-                                            )
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = topLevelRoute.icon,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    )
+                                    val isSelected = topLevelRoute == topLevelBackStack.topLevelKey
+                                    NavigationBarItem(selected = isSelected, onClick = {
+                                        topLevelBackStack.addTopLevel(
+                                            topLevelRoute
+                                        )
+                                    }, icon = {
+                                        Icon(
+                                            imageVector = topLevelRoute.icon,
+                                            contentDescription = null
+                                        )
+                                    })
                                 }
                             }
                         }
-                    }
-                ) { _ ->
+                    }) { _ ->
+
+                    /* NavDisplay(
+                         backStack = topLevelBackStack.backStack,
+                         onBack = { topLevelBackStack.removeLast() },
+                         sceneStrategy = bottomSheetStrategy,
+                         entryDecorators = listOf(
+                             rememberSaveableStateHolderNavEntryDecorator(),
+                             rememberViewModelStoreNavEntryDecorator()
+                         ),
+                         entryProvider = { key ->
+                             when (key) {
+                                 is Films -> NavEntry(key) {
+                                     showBottomBar = true
+
+                                     val viewModel =
+                                         hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
+                                             creationCallback = { factory ->
+                                                 factory.create("TOP_POPULAR_ALL")
+                                             })
+
+                                     FilmsRoute(
+                                         viewModel = viewModel, onItemClicked = { item ->
+                                             topLevelBackStack.add(
+                                                 FilmsDetail(
+                                                     item.kinopoiskId ?: 0
+                                                 )
+                                             )
+                                         })
+                                 }
+
+                                 is Premiers -> NavEntry(key) {
+                                     showBottomBar = true
+                                     PremiersRoute()
+                                 }
+
+                                 is FilmsDetail -> NavEntry(key) {
+
+                                     showBottomBar = false
+
+                                     val viewModel =
+                                         hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
+                                             creationCallback = { factory ->
+                                                 factory.create(key.kinopoiskId)
+                                             })
+
+                                     DetailsScreenRoute(
+                                         viewModel, toAllFilmImages = { kinopoiskFilmId ->
+                                             topLevelBackStack.add(
+                                                 FilmImages(
+                                                     kinopoiskFilmId
+                                                 )
+                                             )
+                                         })
+                                 }
+
+                                 is FilmImages -> NavEntry(key) {
+
+                                     val viewModel =
+                                         hiltViewModel<ImagesViewModel, ImagesViewModel.Factory>(
+                                             creationCallback = { factory ->
+                                                 factory.create(key.kinopoiskId)
+                                             })
+
+                                     ImagesRoute(
+                                         viewModel
+                                     )
+
+                                 }
+
+                                 is Search -> NavEntry(key) {
+
+
+                                     val result =
+                                         resultStore.getResultState<SearchFilterUiState?>("SearchBottomSheetResult")
+
+                                     SearchRoute(
+                                         hiltViewModel(), toFilterCLick = {
+                                             topLevelBackStack.add(SearchBottomSheet(it))
+                                         })
+                                 }
+
+                                 is SearchBottomSheet -> NavEntry(
+                                     key, metadata = BottomSheetSceneStrategy.bottomSheet()
+                                 ) {
+                                     SearchFilterRoute(
+                                         key.filtersForSearch,
+                                     ) {
+                                         resultStore.setResult("SearchBottomSheetResult", it)
+                                         topLevelBackStack.removeLast()
+                                     }
+                                 }
+
+                                 else -> error("Unknown route: $key")
+                             }
+                         })*/
+
+
 
                     NavDisplay(
                         backStack = topLevelBackStack.backStack,
@@ -137,111 +232,103 @@ class MainActivity : ComponentActivity() {
                             rememberSaveableStateHolderNavEntryDecorator(),
                             rememberViewModelStoreNavEntryDecorator()
                         ),
-                        entryProvider = { key ->
-                            when (key) {
-                                is Films -> NavEntry(key) {
-                                    showBottomBar = true
+                        entryProvider = entryProvider {
 
-                                    val viewModel =
-                                        hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
-                                            creationCallback = { factory ->
-                                                factory.create("TOP_POPULAR_ALL")
-                                            }
-                                        )
+                            entry<Films> {
+                                showBottomBar = true
 
-                                    FilmsRoute(
-                                        viewModel = viewModel,
-                                        onItemClicked = { item ->
-                                            topLevelBackStack.add(
-                                                FilmsDetail(
-                                                    item.kinopoiskId ?: 0
-                                                )
+                                val viewModel =
+                                    hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
+                                        creationCallback = { factory ->
+                                            factory.create("TOP_POPULAR_ALL")
+                                        })
+                                FilmsRoute(
+                                    viewModel = viewModel, onItemClicked = { item ->
+                                        topLevelBackStack.add(
+                                            FilmsDetail(
+                                                item.kinopoiskId ?: 0
                                             )
-                                        }
-                                    )
-                                }
-
-                                is Premiers -> NavEntry(key) {
-                                    showBottomBar = true
-                                    PremiersRoute()
-                                }
-
-                                is FilmsDetail -> NavEntry(key) {
-
-                                    showBottomBar = false
-
-                                    val viewModel =
-                                        hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
-                                            creationCallback = { factory ->
-                                                factory.create(key.kinopoiskId)
-                                            }
                                         )
-
-                                    DetailsScreenRoute(
-                                        viewModel,
-                                        toAllFilmImages = { kinopoiskFilmId ->
-                                            topLevelBackStack.add(
-                                                FilmImages(
-                                                    kinopoiskFilmId
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-
-                                is FilmImages -> NavEntry(key) {
-
-                                    val viewModel =
-                                        hiltViewModel<ImagesViewModel, ImagesViewModel.Factory>(
-                                            creationCallback = { factory ->
-                                                factory.create(key.kinopoiskId)
-                                            }
-                                        )
-
-                                    ImagesRoute(
-                                        viewModel
-                                    )
-
-                                }
-
-                                is Search -> NavEntry(key) {
-
-                                    val result =
-                                        resultStore.getResultState<SearchFilterUiState?>("SearchBottomSheetResult")
-
-                                    SearchRoute(
-                                        hiltViewModel(),
-                                        toFilterCLick = {
-                                            topLevelBackStack.add(SearchBottomSheet(it))
-                                        }
-                                    )
-                                }
-
-                                is SearchBottomSheet -> NavEntry(
-                                    key,
-                                    metadata = BottomSheetSceneStrategy.bottomSheet()
-                                ) {
-                                    SearchFilterRoute(
-                                        key.filtersForSearch,
-                                    ) {
-                                        resultStore.setResult("SearchBottomSheetResult", it)
-                                        topLevelBackStack.removeLast()
-                                    }
-                                }
-
-                                else -> error("Unknown route: $key")
+                                    })
                             }
+
+                            entry<Premiers> {
+                                showBottomBar = true
+                                PremiersRoute()
+                            }
+
+                            entry<FilmsDetail> {
+                                showBottomBar = false
+
+                                val viewModel =
+                                    hiltViewModel<DetailsScreenViewModel, DetailsScreenViewModel.Factory>(
+                                        creationCallback = { factory ->
+                                            factory.create(it.kinopoiskId)
+                                        })
+                                DetailsScreenRoute(
+                                    viewModel, toAllFilmImages = { kinopoiskFilmId ->
+                                        topLevelBackStack.add(
+                                            FilmImages(
+                                                kinopoiskFilmId
+                                            )
+                                        )
+                                    })
+
+                            }
+
+                            entry<FilmImages> {
+                                val viewModel =
+                                    hiltViewModel<ImagesViewModel, ImagesViewModel.Factory>(
+                                        creationCallback = { factory ->
+                                            factory.create(it.kinopoiskId)
+                                        })
+
+                                ImagesRoute(
+                                    viewModel
+                                )
+                            }
+
+                            entry<Search> {
+
+                                var result by remember {
+                                    mutableStateOf<SearchFilterUiState?>(null)
+                                }
+
+                                LaunchedEffect(
+                                    resultStore
+                                ) {
+                                    result = resultStore.getResultState("SearchBottomSheetResult")
+                                }
+
+                                SearchRoute(
+                                    viewModel = hiltViewModel(),
+                                    result = result,
+                                    toFilterCLick = {
+                                        topLevelBackStack.add(SearchBottomSheet(it))
+                                    })
+                            }
+
+                            entry<SearchBottomSheet>(
+                                metadata = BottomSheetSceneStrategy.bottomSheet()
+                            ) {
+                                SearchFilterRoute(
+                                    viewModel = hiltViewModel(),
+                                    it.filtersForSearch,
+                                ) {
+                                    resultStore.setResult("SearchBottomSheetResult", it)
+                                    topLevelBackStack.removeLast()
+                                }
+                            }
+
                         }
                     )
                 }
-
 
             }
         }
 
     }
 }
-
 
 class TopLevelBackStack<T : Any>(startKey: T) {
 
@@ -257,11 +344,10 @@ class TopLevelBackStack<T : Any>(startKey: T) {
     // Expose the back stack so it can be rendered by the NavDisplay
     val backStack = mutableStateListOf(startKey)
 
-    private fun updateBackStack() =
-        backStack.apply {
-            clear()
-            addAll(topLevelStacks.flatMap { it.value })
-        }
+    private fun updateBackStack() = backStack.apply {
+        clear()
+        addAll(topLevelStacks.flatMap { it.value })
+    }
 
     fun addTopLevel(key: T) {
 

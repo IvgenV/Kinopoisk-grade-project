@@ -11,6 +11,7 @@ import com.example.core.data.model.dto.SearchDetailFilter.CountryFilter
 import com.example.core.data.model.dto.SearchDetailFilter.GenreFilter
 import com.example.core.data.model.dto.SearchDetailFilter.YearsFilter
 import com.example.core.data.model.dto.SearchDetailFilterSaver
+import com.example.kinopoisk.feature.search.SearchViewModel
 import com.example.kinopoisk.feature.search.components.SearchFilterScreen
 import com.example.kinopoisk.feature.search.data.SearchFilterUiState
 import com.example.kinopoisk.feature.search.data.UserSaver
@@ -21,6 +22,7 @@ import com.example.kinopoisk.feature.search.filterDetail.FilterDetailScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFilterRoute(
+    viewModel: SearchViewModel,
     filtersUiState: SearchFilterUiState,
     applyFilter: (SearchFilterUiState) -> Unit,
 ) {
@@ -46,7 +48,7 @@ fun SearchFilterRoute(
             SearchFilterScreen(
                 localFiltersUiState,
                 applyFilter = {
-                    applyFilter.invoke(localFiltersUiState)
+                    applyFilter(localFiltersUiState)
                 },
                 filterDetailClick = { searchDetailFilter ->
                     selectedDetailsFilterScreen = when (searchDetailFilter) {
