@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `kotlin-dsl`
-    alias(libs.plugins.android.lint)
+    //alias(libs.plugins.android.lint)
 }
 
 group = "com.example.kinopoisk.buildlogic"
@@ -44,7 +44,7 @@ dependencies {
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.room.gradlePlugin)
     implementation(libs.truth)
-    lintChecks(libs.androidx.lint.gradle)
+    //lintChecks(libs.androidx.lint.gradle)
 }
 
 tasks {
@@ -61,7 +61,7 @@ gradlePlugin {
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidApplication") {
-            id = libs.plugins.nowinandroid.android.application.asProvider().get().pluginId
+            id = libs.plugins.kinopoisk.android.application.get().pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidApplicationJacoco") {
@@ -76,9 +76,13 @@ gradlePlugin {
             id = libs.plugins.nowinandroid.android.library.asProvider().get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
         }
-        register("androidFeature") {
-            id = libs.plugins.nowinandroid.android.feature.get().pluginId
-            implementationClass = "AndroidFeatureConventionPlugin"
+        register("androidFeatureImpl") {
+            id = libs.plugins.nowinandroid.android.feature.impl.get().pluginId
+            implementationClass = "AndroidFeatureImplConventionPlugin"
+        }
+        register("androidFeatureApi") {
+            id = libs.plugins.nowinandroid.android.feature.api.get().pluginId
+            implementationClass = "AndroidFeatureApiConventionPlugin"
         }
         register("androidLibraryJacoco") {
             id = libs.plugins.nowinandroid.android.library.jacoco.get().pluginId
@@ -100,13 +104,17 @@ gradlePlugin {
             id = libs.plugins.nowinandroid.android.application.flavors.get().pluginId
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
-        register("androidLint") {
-            id = libs.plugins.nowinandroid.android.lint.get().pluginId
-            implementationClass = "AndroidLintConventionPlugin"
-        }
+//        register("androidLint") {
+//            id = libs.plugins.nowinandroid.android.lint.get().pluginId
+//            implementationClass = "AndroidLintConventionPlugin"
+//        }
         register("jvmLibrary") {
             id = libs.plugins.nowinandroid.jvm.library.get().pluginId
             implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("root") {
+            id = libs.plugins.nowinandroid.root.get().pluginId
+            implementationClass = "RootPlugin"
         }
     }
 }

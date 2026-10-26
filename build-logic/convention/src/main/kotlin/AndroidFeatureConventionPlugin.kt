@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.example.kinopoisk.configureGradleManagedDevices
 import com.example.kinopoisk.libs
 import org.gradle.api.Plugin
@@ -28,7 +28,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         with(target) {
             apply(plugin = "nowinandroid.android.library")
             apply(plugin = "nowinandroid.hilt")
-            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             extensions.configure<LibraryExtension> {
                 testOptions.animationsDisabled = true

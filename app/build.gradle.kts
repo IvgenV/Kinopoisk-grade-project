@@ -1,29 +1,25 @@
 import com.example.kinopoisk.NiaBuildType
 
 plugins {
-    alias(libs.plugins.nowinandroid.android.application)
+    alias(libs.plugins.kinopoisk.android.application)
     alias(libs.plugins.nowinandroid.android.application.compose)
     alias(libs.plugins.nowinandroid.android.application.flavors)
     alias(libs.plugins.nowinandroid.android.application.jacoco)
     alias(libs.plugins.nowinandroid.hilt)
-    id("com.google.android.gms.oss-licenses-plugin")
+    alias(libs.plugins.google.osslicenses)
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "com.example.kinopoisk"
-    compileSdk = 36
-
     defaultConfig {
-        applicationId = "com.vadarod.kinopoiskGrade"
-        minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = "com.google.samples.apps.kinopoisk"
+        versionCode = 8
+        versionName = "0.1.2" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Custom test runner to set up Hilt dependency graph
+        testInstrumentationRunner = "com.google.samples.apps.kinopoisk.core.testing.NiaTestRunner"
     }
 
     buildTypes {
@@ -31,7 +27,8 @@ android {
             applicationIdSuffix = NiaBuildType.DEBUG.applicationIdSuffix
         }
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = providers.gradleProperty("minifyWithR8")
+                .map(String::toBooleanStrict).getOrElse(true)
             applicationIdSuffix = NiaBuildType.RELEASE.applicationIdSuffix
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro")
@@ -40,15 +37,16 @@ android {
             // who clones the code to sign and run the release variant, use the debug signing key.
             // TODO: Abstract the signing configuration to a separate file to avoid hardcoding this.
             signingConfig = signingConfigs.named("debug").get()
-            // Ensure Baseline Profile is fresh for release builds.
-            //baselineProfile.automaticGenerationDuringBuild = true
         }
     }
+
     packaging {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
+    testOptions.unitTests.isIncludeAndroidResources = true
+    namespace = "com.google.samples.apps.kinopoisk"
 }
 
 dependencies {
@@ -60,36 +58,32 @@ dependencies {
     implementation(projects.core.base)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.androidx.compose.material3.adaptive.layout)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.compose.material3.windowSizeClass)
     implementation(libs.androidx.compose.runtime.tracing)
+    implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewModel.navigation3)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.androidx.tracing.ktx)
     implementation(libs.androidx.window.core)
     implementation(libs.kotlinx.coroutines.guava)
     implementation(libs.coil.kt)
-    implementation(libs.coil.kt.compose)
-    implementation(libs.coil.kt.svg)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.material3.navigation3)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.compose.ui.testManifest)
-
     kspTest(libs.hilt.compiler)
+
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.kotlin.test)
 

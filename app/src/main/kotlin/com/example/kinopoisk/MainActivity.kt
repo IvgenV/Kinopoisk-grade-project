@@ -28,7 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
                     NavDisplay(
                         backStack = topLevelBackStack.backStack,
                         onBack = { topLevelBackStack.removeLast() },
-                        sceneStrategy = bottomSheetStrategy,
+                        sceneStrategies = listOf(bottomSheetStrategy),
                         entryDecorators = listOf(
                             rememberSaveableStateHolderNavEntryDecorator(),
                             rememberViewModelStoreNavEntryDecorator()
@@ -140,13 +140,6 @@ class MainActivity : ComponentActivity() {
                                     val result =
                                         resultStore.getResultState<FilmsCollection?>()
                                             ?: TOP_POPULAR_ALL
-
-                                    val viewModel =
-                                        hiltViewModel<FilmsViewModel, FilmsViewModel.Factory>(
-                                            creationCallback = { factory ->
-                                                factory.create(result.name)
-                                            }
-                                        )
 
                                     FilmsRoute(
                                         resultState = result.name,
