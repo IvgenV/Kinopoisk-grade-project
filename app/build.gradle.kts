@@ -14,7 +14,7 @@ plugins {
 
 android {
     defaultConfig {
-        applicationId = "com.google.samples.apps.kinopoisk"
+        applicationId = "com.example.kinopoisk"
         versionCode = 8
         versionName = "0.1.2" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
@@ -46,7 +46,7 @@ android {
         }
     }
     testOptions.unitTests.isIncludeAndroidResources = true
-    namespace = "com.google.samples.apps.kinopoisk"
+    namespace = "com.example.kinopoisk"
 }
 
 dependencies {

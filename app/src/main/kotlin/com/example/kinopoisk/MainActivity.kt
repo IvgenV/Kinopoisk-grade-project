@@ -142,6 +142,11 @@ class MainActivity : ComponentActivity() {
                                             ?: TOP_POPULAR_ALL
 
                                     FilmsRoute(
+                                        viewModel = hiltViewModel(
+                                            creationCallback = { factory: FilmsViewModel.Factory  ->
+                                                factory.create("TOP_250_MOVIES")
+                                            }
+                                        ),
                                         resultState = result.name,
                                         toBottomShet = {
                                             topLevelBackStack.add(Filter)
