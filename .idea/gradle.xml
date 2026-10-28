@@ -33,6 +33,7 @@
             <option value="$PROJECT_DIR$/feature/films" />
             <option value="$PROJECT_DIR$/feature/images" />
             <option value="$PROJECT_DIR$/feature/premieres" />
+            <option value="$PROJECT_DIR$/feature/search" />
           </set>
         </option>
       </GradleProjectSettings>

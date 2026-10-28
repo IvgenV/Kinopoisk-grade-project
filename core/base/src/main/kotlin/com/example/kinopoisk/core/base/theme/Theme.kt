@@ -53,7 +53,7 @@ val LightDefaultColorScheme = lightColorScheme(
     onError = Color.White,
     errorContainer = Red90,
     onErrorContainer = Red10,
-    background = Black,
+    background = PurpleGray80,
     onBackground = DarkPurpleGray10,
     surface = Black,
     onSurface = Black,
@@ -198,13 +198,25 @@ fun KinopoiskTheme(
 ) {
     // Color scheme
     val colorScheme = when {
-        androidTheme -> if (darkTheme) DarkAndroidColorScheme else LightAndroidColorScheme
+        androidTheme -> if (darkTheme){
+            DarkAndroidColorScheme
+        } else{
+            LightAndroidColorScheme
+        }
         !disableDynamicTheming && supportsDynamicTheming() -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme){
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
         }
 
-        else -> if (darkTheme) DarkDefaultColorScheme else LightDefaultColorScheme
+        else -> if (darkTheme){
+            DarkDefaultColorScheme
+        } else {
+            LightDefaultColorScheme
+        }
     }
     // Gradient colors
     val emptyGradientColors = GradientColors(container = colorScheme.surfaceColorAtElevation(2.dp))

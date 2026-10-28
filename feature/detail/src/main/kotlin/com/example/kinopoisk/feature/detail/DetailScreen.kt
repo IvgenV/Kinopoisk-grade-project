@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -72,7 +73,7 @@ fun DetailScreen(
     LazyColumn(
         Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+            .navigationBarsPadding()
             .background(MaterialTheme.colorScheme.primary)
     ) {
 
@@ -137,7 +138,7 @@ fun DetailScreen(
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    text = "${uiState.nameOriginal}"
+                    text = uiState.nameOriginal
                 )
             }
             Row(
@@ -167,11 +168,17 @@ fun DetailScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(end = 4.dp),
-                    text = uiState.country.orEmpty()
-                )
+                uiState.country.forEachIndexed { index, country ->
+                    Text(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(end = 4.dp),
+                        text = if (uiState.country.lastIndex == index) {
+                            country
+                        } else {
+                            "${country}, "
+                        }
+                    )
+                }
                 Text(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 4.dp),
@@ -245,7 +252,7 @@ private fun DetailScreenPreview() {
                 logoUrl = "sdsf",
                 ratingKinopoisk = 8.0,
                 ratingKinopoiskVoteCount = 107000,
-                country = "USA",
+                country = listOf("USA", "Britain", "Italy"),
                 filmDuration = "2ч 55м",
                 description = "1980-е годы, тихий провинциальный американский городок. Благоприятное течение местной жизни нарушает загадочное исчезновение подростка по имени Уилл. Выяснить обстоятельства дела полны решимости родные мальчика и местный шериф, также события затрагивают лучшего друга Уилла – Майка. Он начинает собственное расследование. Майк уверен, что близок к разгадке, и теперь ему предстоит оказаться в эпицентре ожесточенной битвы потусторонних сил.",
                 year = 2022,

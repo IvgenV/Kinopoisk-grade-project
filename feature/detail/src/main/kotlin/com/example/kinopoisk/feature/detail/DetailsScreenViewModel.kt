@@ -45,7 +45,7 @@ class DetailsScreenViewModel @AssistedInject constructor(
             .collect { filmData ->
                 _uiState.value = createUiState(
                     filmDetailResponse = filmData.filmDetails,
-                    posters = filmData.posters
+                    posters = filmData.posters,
                 )
             }
 
@@ -68,7 +68,9 @@ class DetailsScreenViewModel @AssistedInject constructor(
                 year = startYear ?: year,
                 filmDuration = filmLength?.toFilmDuration(),
                 genres = genres?.filterNotNull()?.take(2)?.map { it.genre.orEmpty() }.orEmpty(),
-                posters = posters.mapNotNull { it.imageUrl }
+                posters = posters.mapNotNull { it.imageUrl },
+                country = countries?.filterNotNull()?.take(3)?.map { it.country.orEmpty() }.orEmpty(),
+                description = description
             )
         }
 

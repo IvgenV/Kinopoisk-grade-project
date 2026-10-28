@@ -1,12 +1,12 @@
 package com.example.core.data.model.response
 
 
-import com.example.core.data.model.dto.FilmsCollectionsDto
+import com.example.core.data.model.dto.FilmsByFiltersDomain
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class FilmsCollectionsResponse(
+class FilmsByFiltersDto(
     @Json(name = "items")
     val items: List<Item?>? = null,
 ): BasePagingResponse() {
@@ -51,15 +51,9 @@ class FilmsCollectionsResponse(
     }
 }
 
-fun FilmsCollectionsResponse.toTdo() = FilmsCollectionsDto(
-    items = items?.map { it?.toTdo() } ?: emptyList(),
-    total = total ?: 0,
-    totalPages = totalPages ?: 0
-)
-
-fun FilmsCollectionsResponse.Item.toTdo() = FilmsCollectionsDto.Item(
-    countries = countries?.map { it?.toDto() } ?: emptyList(),
-    genres = genres?.map { it?.toDto() } ?: emptyList(),
+fun FilmsByFiltersDto.Item.toDomain() = FilmsByFiltersDomain.ItemDomain(
+    countries = countries?.map { it?.toDomain() } ?: emptyList(),
+    genreDomains = genres?.map { it?.toDomain() } ?: emptyList(),
     kinopoiskId = kinopoiskId,
     nameEn = nameEn,
     nameOriginal = nameOriginal,
@@ -72,10 +66,10 @@ fun FilmsCollectionsResponse.Item.toTdo() = FilmsCollectionsDto.Item(
     year = year
 )
 
-fun FilmsCollectionsResponse.Item.Country.toDto() = FilmsCollectionsDto.Item.Country(
+fun FilmsByFiltersDto.Item.Country.toDomain() = FilmsByFiltersDomain.ItemDomain.CountryDomain(
     country = country
 )
 
-fun FilmsCollectionsResponse.Item.Genre.toDto() = FilmsCollectionsDto.Item.Genre(
+fun FilmsByFiltersDto.Item.Genre.toDomain() = FilmsByFiltersDomain.ItemDomain.GenreDomain(
     genre = genre
 )

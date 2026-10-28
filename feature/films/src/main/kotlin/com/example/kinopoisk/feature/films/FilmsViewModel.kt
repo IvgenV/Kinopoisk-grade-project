@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.core.data.model.dto.FilmsCollectionsDto
+import com.example.core.data.model.dto.FilmsByFiltersDomain
 import com.example.core.data.repository.films.FilmsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -18,7 +18,7 @@ class FilmsViewModel @AssistedInject constructor(
     filmsRepository: FilmsRepository
 ) : ViewModel() {
 
-    val films: Flow<PagingData<FilmsCollectionsDto.Item>> = filmsRepository.getFilmsCollections(
+    val films: Flow<PagingData<FilmsByFiltersDomain.ItemDomain>> = filmsRepository.getFilmsCollections(
         screenType
     ).cachedIn(viewModelScope)
 

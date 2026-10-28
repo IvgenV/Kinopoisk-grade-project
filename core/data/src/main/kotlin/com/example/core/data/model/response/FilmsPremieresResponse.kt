@@ -49,12 +49,12 @@ data class FilmsPremieresResponse(
     }
 }
 
-fun FilmsPremieresResponse.toDto(): List<PremierItemDto> = items?.mapNotNull { it?.toDto() } ?: emptyList()
+fun FilmsPremieresResponse.toDomain(): List<PremierItemDto> = items?.mapNotNull { it?.toDomain() } ?: emptyList()
 
-fun FilmsPremieresResponse.Item.toDto() = PremierItemDto(
-    countries = countries?.map { it?.toDto() } ?: emptyList(),
+fun FilmsPremieresResponse.Item.toDomain() = PremierItemDto(
+    countries = countries?.map { it?.toDomain() } ?: emptyList(),
     duration = duration,
-    genres = genres?.map { it?.toDto() } ?: emptyList(),
+    genres = genres?.map { it?.toDomain() } ?: emptyList(),
     kinopoiskId = kinopoiskId,
     nameEn = nameEn,
     nameRu = nameRu,
@@ -64,10 +64,10 @@ fun FilmsPremieresResponse.Item.toDto() = PremierItemDto(
     year = year
 )
 
-fun FilmsPremieresResponse.Item.Country.toDto() = PremierItemDto.Country(
+fun FilmsPremieresResponse.Item.Country.toDomain() = PremierItemDto.Country(
     country = country
 )
 
-fun FilmsPremieresResponse.Item.Genre.toDto() = PremierItemDto.Genre(
+fun FilmsPremieresResponse.Item.Genre.toDomain() = PremierItemDto.Genre(
     genre = genre
 )

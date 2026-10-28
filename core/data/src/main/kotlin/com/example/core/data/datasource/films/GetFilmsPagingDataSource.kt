@@ -2,8 +2,8 @@ package com.example.core.data.datasource.films
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.core.data.model.dto.FilmsCollectionsDto
-import com.example.core.data.model.response.toTdo
+import com.example.core.data.model.dto.FilmsByFiltersDomain
+import com.example.core.data.model.response.toDomain
 import com.example.core.data.network.MovieService
 import com.example.kinopoisk.core.base.Constants.INITIAL_PAGE_NO
 import dagger.assisted.Assisted
@@ -13,27 +13,31 @@ import dagger.assisted.AssistedInject
 class GetFilmsPagingDataSource @AssistedInject constructor(
     private val movieApi: MovieService,
     @Assisted
-    private val type: String
-) : PagingSource<Int, FilmsCollectionsDto.Item>() {
+    private val queryParams: Map<String, Any>
+) : PagingSource<Int, FilmsByFiltersDomain.ItemDomain>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FilmsCollectionsDto.Item> {
+    var maxPage: Int? = null
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FilmsByFiltersDomain.ItemDomain> {
         return try {
             val nextPage = params.key ?: INITIAL_PAGE_NO
-            val maxPage: Int
 
-            movieApi.getFilmsCollections(
-                page = nextPage,
-                type = type
-            ).toTdo().let {
-                maxPage = it.totalPages
-                val cardList: List<FilmsCollectionsDto.Item> =
-                    it.items.filterNotNull()
-                LoadResult.Page(
-                    data = cardList,
-                    prevKey = null,
-                    nextKey = if (nextPage == maxPage) null else nextPage.inc()
-                )
+            val response = movieApi.films(
+                params = queryParams
+            )
+
+            if (maxPage == null) {
+                maxPage = response.totalPages
             }
+
+            val cardList: List<FilmsByFiltersDomain.ItemDomain> =
+                response.items?.mapNotNull { it?.toDomain() }.orEmpty()
+
+            LoadResult.Page(
+                data = cardList,
+                prevKey = null,
+                nextKey = if (nextPage == maxPage) null else nextPage.inc()
+            )
 
         } catch (ex: Exception) {
             LoadResult.Error(Throwable(ex.message))
@@ -41,7 +45,7 @@ class GetFilmsPagingDataSource @AssistedInject constructor(
     }
 
 
-    override fun getRefreshKey(state: PagingState<Int, FilmsCollectionsDto.Item>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, FilmsByFiltersDomain.ItemDomain>): Int? {
         return state.anchorPosition
     }
 }
@@ -49,6 +53,6 @@ class GetFilmsPagingDataSource @AssistedInject constructor(
 @AssistedFactory
 interface GetFilmsPagingDataSourceFactory {
     fun create(
-        type: String
+        queryParams: Map<String, Any>
     ): GetFilmsPagingDataSource
 }
