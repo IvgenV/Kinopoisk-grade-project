@@ -6,6 +6,11 @@ plugins {
 
 android {
     namespace = "com.example.kinopoisk.feature.detail"
+
+    testOptions {
+        // DetailsScreenViewModel calls android.util.Log in its error handler
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -19,6 +24,7 @@ dependencies {
     implementation(libs.paging.compose)
     implementation(libs.paging.runtime)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.test.espresso.core)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.compose.material3.adaptive.navigation3)

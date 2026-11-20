@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.feature.premieres)
     implementation(projects.feature.detail)
     implementation(projects.feature.images)
+    implementation(projects.feature.search)
     implementation(projects.core.data)
     implementation(projects.core.base)
 

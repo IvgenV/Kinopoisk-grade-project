@@ -42,7 +42,6 @@ dependencies {
     compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
-    compileOnly(libs.room.gradlePlugin)
     implementation(libs.truth)
     //lintChecks(libs.androidx.lint.gradle)
 }
@@ -95,10 +94,6 @@ gradlePlugin {
         register("hilt") {
             id = libs.plugins.nowinandroid.hilt.get().pluginId
             implementationClass = "HiltConventionPlugin"
-        }
-        register("androidRoom") {
-            id = libs.plugins.nowinandroid.android.room.get().pluginId
-            implementationClass = "AndroidRoomConventionPlugin"
         }
         register("androidFlavors") {
             id = libs.plugins.nowinandroid.android.application.flavors.get().pluginId

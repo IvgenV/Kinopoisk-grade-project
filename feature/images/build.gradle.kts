@@ -13,7 +13,6 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.base)
     implementation(libs.androidx.compose.material3)
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -23,7 +22,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.espresso.core)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.compose.material3.adaptive.navigation3)
-
     implementation(libs.coil.kt)
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)

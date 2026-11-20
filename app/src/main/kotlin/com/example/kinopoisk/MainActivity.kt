@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -40,9 +41,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.kinopoisk.core.base.theme.KinopoiskTheme
 import com.example.kinopoisk.feature.detail.DetailsScreenRoute
 import com.example.kinopoisk.feature.detail.DetailsScreenViewModel
-import com.example.kinopoisk.feature.films.FilmsCollection
-import com.example.kinopoisk.feature.films.FilmsCollection.TOP_POPULAR_ALL
-import com.example.kinopoisk.feature.films.FilmsFilterScreen
 import com.example.kinopoisk.feature.films.FilmsRoute
 import com.example.kinopoisk.feature.films.FilmsViewModel
 import com.example.kinopoisk.feature.images.ImagesRoute
@@ -138,7 +136,7 @@ class MainActivity : ComponentActivity() {
                         NavDisplay(
                             backStack = topLevelBackStack.backStack,
                             onBack = { topLevelBackStack.removeLast() },
-                            sceneStrategy = bottomSheetStrategy,
+                            sceneStrategies = listOf(bottomSheetStrategy),
                             entryDecorators = listOf(
                                 rememberSaveableStateHolderNavEntryDecorator(),
                                 rememberViewModelStoreNavEntryDecorator()
@@ -155,7 +153,8 @@ class MainActivity : ComponentActivity() {
                                                 })
 
                                         FilmsRoute(
-                                            viewModel = viewModel, onItemClicked = { item ->
+                                            viewModel = viewModel,
+                                            onItemClicked = { item ->
                                                 topLevelBackStack.add(
                                                     FilmsDetail(
                                                         item.kinopoiskId ?: 0
